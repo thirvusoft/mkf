@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include mk_fiber *.css
+recursive-include mk_fiber *.csv
+recursive-include mk_fiber *.html
+recursive-include mk_fiber *.ico
+recursive-include mk_fiber *.js
+recursive-include mk_fiber *.json
+recursive-include mk_fiber *.md
+recursive-include mk_fiber *.png
+recursive-include mk_fiber *.py
+recursive-include mk_fiber *.svg
+recursive-include mk_fiber *.txt
+recursive-exclude mk_fiber *.pyc
