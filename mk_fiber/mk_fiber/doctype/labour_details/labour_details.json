@@ -1,7 +1,6 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:labour_name",
  "creation": "2022-03-14 14:29:28.728063",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -19,9 +18,8 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Labour Name",
-   "options": "Labour",
-   "reqd": 1,
-   "unique": 1
+   "options": "Employee",
+   "reqd": 1
   },
   {
    "fieldname": "work_process",
@@ -52,7 +50,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-03-14 14:33:18.330437",
+ "modified": "2022-03-15 08:26:03.952333",
  "modified_by": "Administrator",
  "module": "Mk Fiber",
  "name": "Labour Details",
