@@ -5,11 +5,14 @@ def execute(filters=None):
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 	employee = filters.get("employee_name")	
+		
+
 	conditions = ""
 	if from_date or to_date or employee:
-		conditions = " where 1 = 1 "
+		conditions = " where 1=1"
 		if from_date and to_date:
 			conditions += " and se.posting_date between '{0}' and '{1}' ".format(from_date, to_date)
+		
 		if employee:
 			conditions += " and ld.labour_name ='{0}' ".format(employee)
 	report_data = frappe.db.sql("""select ld.labour_name,ld.work_process,ld.total_count,
@@ -20,6 +23,7 @@ def execute(filters=None):
 								   {0}
 								   order by posting_date;
 						""".format(conditions))
+	
 	columns, data = get_columns(), report_data
 	return columns, data
 
