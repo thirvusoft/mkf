@@ -8,7 +8,6 @@ def execute(filters=None):
 	conditions = ""
 	if supplier:
 			conditions += " and sup.name = '{0}' ".format(supplier)
-	frappe.errprint(conditions)
 
 	report_data = frappe.db.sql("""
 								select pr.supplier,pri.item_code,sed.batch_no
@@ -24,7 +23,6 @@ def execute(filters=None):
 								
 				""".format(conditions))
 
-	frappe.errprint(report_data)
 	columns, data = get_columns(), report_data
 	return columns, data
 
