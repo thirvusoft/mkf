@@ -89,13 +89,14 @@ doctype_js = {"Stock Entry" : "mk_fiber/custom/js/stockentry.js"}
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-#	}
-# }
+doc_events = {
+	"Employee": {
+		# "on_update": "method",
+		# "on_cancel": "method",
+		# "on_trash": "method",
+		"before_save": "mk_fiber.mk_fiber.custom.python.employee.auto_name"
+	}
+}
 
 # Scheduled Tasks
 # ---------------
