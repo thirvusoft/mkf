@@ -43,20 +43,23 @@ def get_columns():
 		_("Batch No") + "::150",
 		_("Total Qty") + "::150",
 		_("Total Urithengai Qty") + "::150",
-		_("Total Paruppu Qty") + "::150",
+		_("Total Paruppu Qty") + "::180",
 		_("Profit Percentage") + "::150"
 	]
 	return columns
 
 def execute(filters=None):
 	columns,data=get_columns(),[]
+	start_date=filters['start_date']
+	end_date=filters['end_date']
 	filter={'item':'1001'}
-	if(filters):
+	if(filters.get('supplier')):
 		filter['supplier']=filters['supplier']
+	filter['creation']=["between",[start_date,end_date]]
 	su=frappe.get_all('Batch',filter,['name','supplier'])
 	batch_wise={}
+	se=frappe.get_all('Stock Entry',{'stock_entry_type':'Repack'})
 	for i in su:
-		se=frappe.get_all('Stock Entry',{'stock_entry_type':'Repack'})
 		cocobatch=[]
 		for j in se:
 			x=frappe.get_doc('Stock Entry',j.name)
@@ -80,19 +83,20 @@ def execute(filters=None):
 			for j in se:
 				x=frappe.get_doc('Stock Entry',j.name)
 				for g in x.items:
-					if(g.item_code=='1002' and g.s_warehouse!=''  and g.batch_no==i):
+					if(g.item_code=='1002' and g.s_warehouse  and g.batch_no==i):
 						for t in x.items:
 							if(t.item_code=='1002' or t.item_code=='1003'):
 								uribatch[t.item_code]+=t.qty
 						continue
+				
 		uribatch_wise[l]=uribatch
-	
 
 	# Direct urithengai purchase
 	urithengaibatch={}
 	filter={'item_code':'1002'}
-	if(filters):
+	if(filters.get('supplier')):
 		filter['supplier']=filters['supplier']	
+		filter['posting_date']=["between",[start_date,end_date]]
 	for pr in frappe.get_all('Purchase Receipt',filter):
 		prdoc=frappe.get_doc('Purchase Receipt',pr.name)
 		for item in prdoc.items:
@@ -130,6 +134,5 @@ def execute(filters=None):
 			'total_paruppu_qty':uribatch_wise[i]['1003'],
 			'profit_percentage':round((uribatch_wise[i]['1003']/(uribatch_wise[i]['1002'] or 1)*100)/1 if(uribatch_wise[i]['1002']!=0) else 0 ,2)
 		})
-	return columns,data
 	return columns,data
 
