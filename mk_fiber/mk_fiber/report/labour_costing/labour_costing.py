@@ -31,11 +31,11 @@ def execute(filters=None):
 def get_columns():
 	columns = [
 		_("Labour Name") + ":Link/Employee:130",
-		_("Process") + ":Labour Details:90",
+		_("Process") + ":Labour Details:150",
 		_("Total Count") + ":int/Labour Details:100",
 		_("Cost Per Piece") + ":Curreny:180",
 		_("Total Cost") + ":Currency:120",
-		_("Balance Amount") + ":Currency:120"
+		_("Balance Amount") + ":Currency:150"
 		]
 	
 	return columns
