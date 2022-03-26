@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Profit and Loss report"] = {
+frappe.query_reports["Supplier Wise Report"] = {
 	"filters": [
 		{
 			"fieldname":"supplier",
@@ -14,12 +14,14 @@ frappe.query_reports["Profit and Loss report"] = {
 			"fieldname":"start_date",
 			"label": __("Start Date"),
 			"fieldtype": "Date",
+			"default":frappe.datetime.month_start(),
 			"reqd":1
 		},
 		{
 			"fieldname":"end_date",
 			"label": __("End Date"),
 			"fieldtype": "Date",
+			"default":frappe.datetime.month_end(),
 			"reqd":1
 		}
 	]

@@ -3,48 +3,15 @@ import frappe
 from frappe import _
 
 
-# def execute(filters=None):
-# 	print(filters)
-# 	columns, data = [] , []
-# 	columns = get_columns()
-# 	repack_items = frappe.get_list('Stock Entry Detail', {'item_code', 'item_name', 'qty', 'batch_no', 'parent'})
-
-# 	print(repack_items)
-# 	print(frappe.get_list('Stock Entry Detail', {'item_code', 'item_name', 'qty', 'batch_no', 'parent'}))
-# 	pr_items = frappe.get_list('Purchase Receipt Item', {'item_code', 'item_name', 'qty', 'batch_no', 'parent'})
-# 	final_data = []
-# 	for row in pr_items:
-# 		purchase_item_wise_se_list = frappe.get_list('Stock Entry Detail', {'item_code':row['item_code'], 'batch_no':row['batch_no']},['parent'])
-# 		total_paruppu_qty = 0
-# 		total_urithengai_qty = 0
-# 		for row1 in purchase_item_wise_se_list:
-# 			print(frappe.get_list('Stock Entry Detail', {'item_code':'1003'}, ['qty'],pluck='qty'))
-# 			print(frappe.get_list('Stock Entry Detail', {'item_code':'1002','t_warehouse':None},['t_warehouse']))
-# 			total_paruppu_qty += sum(frappe.get_list('Stock Entry Detail', {'item_code':'1003'}, ['qty'],pluck='qty'))
-# 			total_urithengai_qty += sum(frappe.get_list('Stock Entry Detail', {'item_code':'1002'}, ['qty'],pluck='qty'))	
-# 			print(total_urithengai_qty)
-# 		final_data.append({'supplier':frappe.db.get_value('Purchase Receipt', row['parent'], 'supplier'), 
-# 							'item_code':row['item_code'],
-# 							'item_name':row['item_name'],
-# 							'batch_no':row['batch_no'],
-# 							'total_qty':row['qty'],
-# 							'total_urithengai_qty': total_urithengai_qty,
-# 							'total_paruppu_qty': total_paruppu_qty,
-# 							'profit_percentage':(total_paruppu_qty/row['qty'])*100 if total_paruppu_qty else 0})
-
-
-# 	return columns, final_data
-
-
 def get_columns():
 	columns = [
 		_("Supplier") + ":Link/Supplier:150",
 		_("Item Code") + ":Link/Item:150",
 		_("Batch No") + "::150",
 		_("Total Qty") + "::150",
-		_("Total Urithengai Qty") + "::150",
-		_("Total Paruppu Qty") + "::180",
-		_("Profit Percentage") + "::150"
+		_("Total Urithengai Qty (in NOS)") + "::250",
+		_("Total Paruppu (in Kg)") + "::180",
+		_("Paruppu Percentage") + "::150"
 	]
 	return columns
 
@@ -96,7 +63,7 @@ def execute(filters=None):
 	filter={'item_code':'1002'}
 	if(filters.get('supplier')):
 		filter['supplier']=filters['supplier']	
-		filter['posting_date']=["between",[start_date,end_date]]
+	filter['posting_date']=["between",[start_date,end_date]]
 	for pr in frappe.get_all('Purchase Receipt',filter):
 		prdoc=frappe.get_doc('Purchase Receipt',pr.name)
 		for item in prdoc.items:
@@ -130,9 +97,10 @@ def execute(filters=None):
 			'item_code':'1001',
 			'batch_no':i,
 			'total_qty':uribatch_wise[i]['total_qty'],
-			'total_urithengai_qty':uribatch_wise[i]['1002'],
-			'total_paruppu_qty':uribatch_wise[i]['1003'],
-			'profit_percentage':round((uribatch_wise[i]['1003']/(uribatch_wise[i]['1002'] or 1)*100)/1 if(uribatch_wise[i]['1002']!=0) else 0 ,2)
+			'total_urithengai_qty_(in_nos)':uribatch_wise[i]['1002'],
+			'total_paruppu_(in_kg)':uribatch_wise[i]['1003'],
+			'paruppu_percentage':round((uribatch_wise[i]['1003']/(uribatch_wise[i]['1002'] or 1)*100)/1 if(uribatch_wise[i]['1002']!=0) else 0 ,2)
 		})
+	
 	return columns,data
 
