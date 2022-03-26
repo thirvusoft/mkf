@@ -70,16 +70,16 @@ def execute(filters=None):
 
 	
 	for batch in urithengaibatch:
-		uribatch={'1002':0,'1003':0}
+		uri_batch={'1002':0,'1003':0}
 		for stock_entry in se:
 			se_doc=frappe.get_doc('Stock Entry',stock_entry.name)
 			for item in se_doc.items:
 				if(item.item_code=='1002' and item.s_warehouse!=''  and item.batch_no==batch):
 					for se_items in se_doc.items:
 						if(se_items.item_code=='1002' or se_items.item_code=='1003'):
-							uribatch[se_items.item_code]+=se_items.qty
+							uri_batch[se_items.item_code]+=se_items.qty
 					continue
-		urithengaibatch[batch].update(uribatch)
+		urithengaibatch[batch].update(uri_batch)
 	
 
 	uribatch_wise.update(urithengaibatch)
