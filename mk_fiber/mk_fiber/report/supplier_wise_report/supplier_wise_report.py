@@ -1,4 +1,3 @@
-from asyncio import constants
 import frappe
 from frappe import _
 
