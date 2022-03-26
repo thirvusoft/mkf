@@ -25,37 +25,36 @@ def execute(filters=None):
 	su=frappe.get_all('Batch',filter,['name','supplier'])
 	batch_wise={}
 	se=frappe.get_all('Stock Entry',{'stock_entry_type':'Repack'})
-	for i in su:
-		cocobatch=[]
-		for j in se:
-			x=frappe.get_doc('Stock Entry',j.name)
-			for g in x.items:
-				if g.batch_no==i.name :
-					cocobatch.append(*[t.batch_no for t in x.items if(t.item_code=='1002') ])
+	for supplier in su:
+		coco_batch=[]
+		for stock_entry in se:
+			se_doc=frappe.get_doc('Stock Entry',stock_entry.name)
+			for se_item in se_doc.items:
+				if se_item.batch_no==supplier.name :
+					cocobatch.append(*[item.batch_no for item in se_doc.items if(item.item_code=='1002') ])
 					continue
 				
-		batch_wise[i.name]=cocobatch
+		batch_wise[supplier.name]=coco_batch
 	uribatch_wise={}
-	for l in batch_wise:
-		uribatch={'1002':0,'1003':0,'total_qty':0}
-		pr=frappe.get_all('Purchase Receipt',{'supplier':frappe.get_value('Batch',l,'supplier')})
-		for i in pr:
-			prdoc=frappe.get_doc('Purchase Receipt',i.name)
+	for supplier in batch_wise:
+		uri_batch={'1002':0,'1003':0,'total_qty':0}
+		pr=frappe.get_all('Purchase Receipt',{'supplier':frappe.get_value('Batch',supplier,'supplier')})
+		for purchase_reci in pr:
+			prdoc=frappe.get_doc('Purchase Receipt',purchase_reci.name)
 			for item in prdoc.items:
-				if(item.batch_no==l):
-					uribatch['total_qty']=item.qty
-		for i in batch_wise[l]:
-			se=frappe.get_all('Stock Entry',{'stock_entry_type':'Repack'})
-			for j in se:
-				x=frappe.get_doc('Stock Entry',j.name)
-				for g in x.items:
-					if(g.item_code=='1002' and g.s_warehouse  and g.batch_no==i):
-						for t in x.items:
-							if(t.item_code=='1002' or t.item_code=='1003'):
-								uribatch[t.item_code]+=t.qty
+				if(item.batch_no==supplier):
+					uri_batch['total_qty']=item.qty
+		for batch in batch_wise[supplier]:
+			for stock_entry in se:
+				se_doc=frappe.get_doc('Stock Entry',stock_entry.name)
+				for item in se_doc.items:
+					if(item.item_code=='1002' and item.s_warehouse  and item.batch_no==batch):
+						for se_items in se_doc.items:
+							if(se_items.item_code=='1002' or se_items.item_code=='1003'):
+								uri_batch[se_items.item_code]+=se_items.qty
 						continue
 				
-		uribatch_wise[l]=uribatch
+		uribatch_wise[supplier]=uri_batch
 
 	# Direct urithengai purchase
 	urithengaibatch={}
@@ -70,18 +69,17 @@ def execute(filters=None):
 				urithengaibatch[item.batch_no]={'total_qty':item.qty}
 
 	
-	for i in urithengaibatch:
+	for batch in urithengaibatch:
 		uribatch={'1002':0,'1003':0}
-		se=frappe.get_all('Stock Entry',{'stock_entry_type':'Repack'})
-		for j in se:
-			x=frappe.get_doc('Stock Entry',j.name)
-			for g in x.items:
-				if(g.item_code=='1002' and g.s_warehouse!=''  and g.batch_no==i):
-					for t in x.items:
-						if(t.item_code=='1002' or t.item_code=='1003'):
-							uribatch[t.item_code]+=t.qty
+		for stock_entry in se:
+			se_doc=frappe.get_doc('Stock Entry',stock_entry.name)
+			for item in se_doc.items:
+				if(item.item_code=='1002' and item.s_warehouse!=''  and item.batch_no==batch):
+					for se_items in se_doc.items:
+						if(se_items.item_code=='1002' or se_items.item_code=='1003'):
+							uribatch[se_items.item_code]+=se_items.qty
 					continue
-		urithengaibatch[i].update(uribatch)
+		urithengaibatch[batch].update(uribatch)
 	
 
 	uribatch_wise.update(urithengaibatch)
@@ -90,15 +88,15 @@ def execute(filters=None):
 
 
 
-	for i in uribatch_wise:
+	for batch in uribatch_wise:
 		data.append({
-			'supplier':frappe.get_value('Batch',i,'supplier'),
+			'supplier':frappe.get_value('Batch',batch,'supplier'),
 			'item_code':'1001',
-			'batch_no':i,
-			'total_qty':uribatch_wise[i]['total_qty'],
-			'total_urithengai_qty_(in_nos)':uribatch_wise[i]['1002'],
-			'total_paruppu_(in_kg)':uribatch_wise[i]['1003'],
-			'paruppu_percentage':round((uribatch_wise[i]['1003']/(uribatch_wise[i]['1002'] or 1)*100)/1 if(uribatch_wise[i]['1002']!=0) else 0 ,2)
+			'batch_no':batch,
+			'total_qty':uribatch_wise[batch]['total_qty'],
+			'total_urithengai_qty_(in_nos)':uribatch_wise[batch]['1002'],
+			'total_paruppu_(in_kg)':uribatch_wise[batch]['1003'],
+			'paruppu_percentage':round((uribatch_wise[batch]['1003']/(uribatch_wise[batch]['1002'] or 1)*100)/1 if(uribatch_wise[batch]['1002']!=0) else 0 ,2)
 		})
 	
 	return columns,data
