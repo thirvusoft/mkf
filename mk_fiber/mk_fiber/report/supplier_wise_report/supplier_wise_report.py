@@ -31,7 +31,7 @@ def execute(filters=None):
 			se_doc=frappe.get_doc('Stock Entry',stock_entry.name)
 			for se_item in se_doc.items:
 				if se_item.batch_no==supplier.name :
-					cocobatch.append(*[item.batch_no for item in se_doc.items if(item.item_code=='1002') ])
+					coco_batch.append(*[item.batch_no for item in se_doc.items if(item.item_code=='1002') ])
 					continue
 				
 		batch_wise[supplier.name]=coco_batch
