@@ -18,7 +18,7 @@ def execute(filters=None):
 	columns,data=get_columns(),[]
 	start_date=filters['start_date']
 	end_date=filters['end_date']
-	filter={'item':'1001'}
+	filter={'item':'TH001'}
 	if(filters.get('supplier')):
 		filter['supplier']=filters['supplier']
 	filter['creation']=["between",[start_date,end_date]]
@@ -31,13 +31,13 @@ def execute(filters=None):
 			se_doc=frappe.get_doc('Stock Entry',stock_entry.name)
 			for se_item in se_doc.items:
 				if se_item.batch_no==supplier.name :
-					coco_batch.append(*[item.batch_no for item in se_doc.items if(item.item_code=='1002') ])
+					coco_batch.append(*[item.batch_no for item in se_doc.items if(item.item_code=='OR002') ])
 					continue
 				
 		batch_wise[supplier.name]=coco_batch
 	uribatch_wise={}
 	for supplier in batch_wise:
-		uri_batch={'1002':0,'1003':0,'total_qty':0}
+		uri_batch={'OR002':0,'C005':0,'total_qty':0}
 		pr=frappe.get_all('Purchase Receipt',{'supplier':frappe.get_value('Batch',supplier,'supplier')})
 		for purchase_reci in pr:
 			prdoc=frappe.get_doc('Purchase Receipt',purchase_reci.name)
@@ -48,9 +48,9 @@ def execute(filters=None):
 			for stock_entry in se:
 				se_doc=frappe.get_doc('Stock Entry',stock_entry.name)
 				for item in se_doc.items:
-					if(item.item_code=='1002' and item.s_warehouse  and item.batch_no==batch):
+					if(item.item_code=='OR002' and item.s_warehouse  and item.batch_no==batch):
 						for se_items in se_doc.items:
-							if(se_items.item_code=='1002' or se_items.item_code=='1003'):
+							if(se_items.item_code=='OR002' or se_items.item_code=='C005'):
 								uri_batch[se_items.item_code]+=se_items.qty
 						continue
 				
@@ -58,25 +58,25 @@ def execute(filters=None):
 
 	# Direct urithengai purchase
 	urithengaibatch={}
-	filter={'item_code':'1002'}
+	filter={'item_code':'OR002'}
 	if(filters.get('supplier')):
 		filter['supplier']=filters['supplier']	
 	filter['posting_date']=["between",[start_date,end_date]]
 	for pr in frappe.get_all('Purchase Receipt',filter):
 		prdoc=frappe.get_doc('Purchase Receipt',pr.name)
 		for item in prdoc.items:
-			if(item.item_code=='1002'):
+			if(item.item_code=='OR002'):
 				urithengaibatch[item.batch_no]={'total_qty':item.qty}
 
 	
 	for batch in urithengaibatch:
-		uri_batch={'1002':0,'1003':0}
+		uri_batch={'OR002':0,'C005':0}
 		for stock_entry in se:
 			se_doc=frappe.get_doc('Stock Entry',stock_entry.name)
 			for item in se_doc.items:
-				if(item.item_code=='1002' and item.s_warehouse!=''  and item.batch_no==batch):
+				if(item.item_code=='OR002' and item.s_warehouse!=''  and item.batch_no==batch):
 					for se_items in se_doc.items:
-						if(se_items.item_code=='1002' or se_items.item_code=='1003'):
+						if(se_items.item_code=='OR002' or se_items.item_code=='C005'):
 							uri_batch[se_items.item_code]+=se_items.qty
 					continue
 		urithengaibatch[batch].update(uri_batch)
@@ -91,12 +91,12 @@ def execute(filters=None):
 	for batch in uribatch_wise:
 		data.append({
 			'supplier':frappe.get_value('Batch',batch,'supplier'),
-			'item_code':'1001',
+			'item_code':'TH001',
 			'batch_no':batch,
 			'total_qty':uribatch_wise[batch]['total_qty'],
-			'total_urithengai_qty_(in_nos)':uribatch_wise[batch]['1002'],
-			'total_paruppu_(in_kg)':uribatch_wise[batch]['1003'],
-			'paruppu_percentage':round((uribatch_wise[batch]['1003']/(uribatch_wise[batch]['1002'] or 1)*100)/1 if(uribatch_wise[batch]['1002']!=0) else 0 ,2)
+			'total_urithengai_qty_(in_nos)':uribatch_wise[batch]['OR002'],
+			'total_paruppu_(in_kg)':uribatch_wise[batch]['C005'],
+			'paruppu_percentage':round((uribatch_wise[batch]['C005']/(uribatch_wise[batch]['OR002'] or 1)*100)/1 if(uribatch_wise[batch]['OR002']!=0) else 0 ,2)
 		})
 	
 	return columns,data
