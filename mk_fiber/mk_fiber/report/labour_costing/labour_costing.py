@@ -15,13 +15,9 @@ def execute(filters=None):
 		
 		if employee:
 			conditions += " and ld.labour_name ='{0}' ".format(employee)
-	report_data = frappe.db.sql("""select ld.labour_name,
-										 ld.work_process,
-										  ld.total_count,
-										  ld.cost_per_piece,
-										  ld.total_cost,
-										  (ld.total_cost - ld.paid_amount) as total_cost 
-								   
+	report_data = frappe.db.sql("""select ld.labour_name,ld.working_process,
+										  ld.total_count,ld.cost_per_piece,ld.total_cost,
+										  (ld.total_cost -(ld.total_count * ld.cost_per_piece)) as total_cost 
 								   from `tabLabour Details` as ld
 								   left outer join `tabStock Entry` as se on
 								   		se.name = ld.parent
