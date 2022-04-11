@@ -16,7 +16,7 @@ def execute(filters=None):
 		if employee:
 			conditions += " and ld.labour_name ='{0}' ".format(employee)
 	report_data = frappe.db.sql("""select ld.labour_name,
-										 ld.work_process,
+										 ld.working_process,
 										  ld.total_count,
 										  ld.cost_per_piece,
 										  ld.total_cost,
