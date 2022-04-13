@@ -10,3 +10,8 @@ cost_per_piece:function(frm,cdt,cdn){
     cost(frm,cdt,cdn);
 }
 })
+frappe.ui.form.on('Stock Entry',{
+    onload:function(frm){
+        cur_frm.refresh();
+    }
+})
