@@ -1,0 +1,71 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-04-19 16:25:52.014610",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "purpose",
+  "cost",
+  "batch",
+  "doc_name",
+  "paid_amount",
+  "from_se",
+  "from_pr"
+ ],
+ "fields": [
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Data",
+   "label": "Purpose"
+  },
+  {
+   "fieldname": "cost",
+   "fieldtype": "Data",
+   "label": "Cost"
+  },
+  {
+   "fieldname": "doc_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "doc name"
+  },
+  {
+   "fieldname": "batch",
+   "fieldtype": "Data",
+   "label": "Batch No"
+  },
+  {
+   "fieldname": "paid_amount",
+   "fieldtype": "Data",
+   "label": "Paid Amount",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "from_se",
+   "fieldtype": "Check",
+   "label": "From SE",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "from_pr",
+   "fieldtype": "Check",
+   "label": "From PR",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-04-22 09:31:55.600516",
+ "modified_by": "Administrator",
+ "module": "Mk Fiber",
+ "name": "Costing Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
