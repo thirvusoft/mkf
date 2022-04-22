@@ -96,6 +96,12 @@ doc_events = {
 		# "on_cancel": "method",
 		# "on_trash": "method",
 		"before_save": "mk_fiber.mk_fiber.custom.python.employee.auto_name"
+	},
+	"Purchase Receipt":{
+		"on_submit":"mk_fiber.mk_fiber.custom.python.batch.purchase_receipt"
+		},
+	"Stock Entry":{
+		"on_submit":"mk_fiber.mk_fiber.custom.python.batch.stock_entry"
 	}
 }
 

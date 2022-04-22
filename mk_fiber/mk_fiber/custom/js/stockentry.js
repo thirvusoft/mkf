@@ -26,7 +26,7 @@ frappe.ui.form.on("Stock Entry",{
             }
             frm.clear_table("additional_costs")
             var ts_new_row=frm.add_child("additional_costs");
-            ts_new_row.expense_account="Expenses Included In Valuation - Ts",
+            ts_new_row.expense_account="Expenses Included In Valuation - MK",
             ts_new_row.description="Purchase Receipt"
             ts_new_row.amount=ts_total_amount
             refresh_field("additional_costs");
