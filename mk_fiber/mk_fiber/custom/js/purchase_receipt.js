@@ -64,15 +64,3 @@ frappe.ui.form.on("Purchase Receipt",{
         }
     }
 })
-
-// frappe.ui.form.on("Purchase Receipt Item",{
-//     item_code:function(frm,cdt,cdn){
-//         let row = locals[cdt][cdn]
-//         if (row.item_code == "Thengai" || row.item_code == "Uri Thengai"){
-//             frappe.model.set_value(cdt,cdn,"is_parent",1)
-//         }
-//         else{
-//             frappe.model.set_value(cdt,cdn,"is_parent",0)
-//         }
-//     }
-// })
