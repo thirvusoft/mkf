@@ -102,6 +102,9 @@ doc_events = {
 		},
 	"Stock Entry":{
 		"on_submit":"mk_fiber.mk_fiber.custom.python.batch.stock_entry"
+	},
+	"Sales Invoice":{
+		"on_submit":"mk_fiber.mk_fiber.custom.python.batch.sales_invoice"
 	}
 }
 

@@ -65,4 +65,30 @@ def stock_entry(self,event):
             })
             doc.save()
     frappe.db.commit()
+
+def sales_invoice(self,event):
+   for s_items in self.items:
+       if(s_items.batch_no):
+           doc=frappe.get_doc('Batch',s_items.batch_no)
+           batch = s_items.batch_no
+           if doc.parent_batch_id:
+               batch = doc.parent_batch_id
+               doc=frappe.get_doc('Batch',batch)
+           child_batch_details= doc.ts_child_batch_details or []
+           child_batch_details.append({
+               "t_warehouse":0,
+               "s_warehouse":0,
+               "sold":1,
+               "item_code":s_items.item_code,
+               "quantity":s_items.qty,
+               "batch_no":s_items.batch_no,
+               "doc_name":s_items.name
+           })
+           doc.update({
+               "ts_child_batch_details":child_batch_details
+           })
+           doc.save()
+   frappe.db.commit()
+
+
             
