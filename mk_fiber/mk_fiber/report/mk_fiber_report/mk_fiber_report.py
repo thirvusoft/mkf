@@ -11,14 +11,19 @@ def execute(filters=None):
 	return columns, data
 
 def get(filters):
-	if(filters == None):
-		pass
-	else:
-		pur_rec_list = frappe.get_all("GL Entry",pluck='name')
-		for i in pur_rec_list:
-			doc = frappe.get_doc("GL Entry",i)
-			frappe.errprint(doc)
-		# frappe.errprint(pur_rec_list)
+		purchase_rec = frappe.get_all("Purchase Receipt",pluck = 'name')
+		batch_lis = frappe.get_all("Batch",pluck='name')
+		for pr in purchase_rec:
+			pr_doc = frappe.get_doc("Purchase Receipt",pr)
+			for bat in pr_doc.items:
+				bat_in_pr = bat.batch_no
+				for i in batch_lis:
+					bat_doc = frappe.get_doc("Batch",i)
+					if bat_in_pr == bat_doc.name:
+						for lis in bat_doc.ts_costing_details:
+							x = []
+							x = lis.doc_name
+						frappe.errprint(x)	#for checking
 
 def get_columns(filters):
 	columns = [
