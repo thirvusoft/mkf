@@ -1,0 +1,161 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-05-04 12:06:13.902388",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "coconut_section",
+  "coconut_in_kg",
+  "column_break_3",
+  "coconut_in_nos",
+  "udaithengai_section",
+  "udaithengai_in_kg",
+  "column_break_7",
+  "udaithengai_in_nos",
+  "urithengai_section",
+  "urithengai_in_kg",
+  "column_break_11",
+  "urithengai_in_nos",
+  "section_break_13",
+  "husk",
+  "column_break_15",
+  "shell",
+  "column_break_17",
+  "copra"
+ ],
+ "fields": [
+  {
+   "fieldname": "coconut_in_kg",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Coconut in KG",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "coconut_in_nos",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Coconut in Nos",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "udaithengai_in_kg",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Udaithengai in Kg",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "udaithengai_in_nos",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Udaithengai in Nos",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "urithengai_in_kg",
+   "fieldtype": "Link",
+   "label": "Urithengai in Kg",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "urithengai_in_nos",
+   "fieldtype": "Link",
+   "label": "Urithengai in Nos",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "husk",
+   "fieldtype": "Link",
+   "label": "Husk",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "shell",
+   "fieldtype": "Link",
+   "label": "Shell",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "copra",
+   "fieldtype": "Link",
+   "label": "Copra",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "coconut_section",
+   "fieldtype": "Section Break",
+   "label": "Coconut"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "udaithengai_section",
+   "fieldtype": "Section Break",
+   "label": "Udaithengai"
+  },
+  {
+   "fieldname": "urithengai_section",
+   "fieldtype": "Section Break",
+   "label": "Urithengai"
+  },
+  {
+   "fieldname": "section_break_13",
+   "fieldtype": "Section Break",
+   "label": "Others"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_15",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_17",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2022-05-04 12:11:08.678764",
+ "modified_by": "Administrator",
+ "module": "Mk Fiber",
+ "name": "TS Item Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

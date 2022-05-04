@@ -9,14 +9,14 @@ frappe.query_reports["MK Fiber Report"] = {
             "label": __("From Date"),
             "fieldtype": "Date",
             "reqd": 1,
-			"default":frappe.datetime.get_today()
+			"default":frappe.datetime.month_start()
 		},
 		{
 			"fieldname":"to_date",
             "label": __("To Date"),
             "fieldtype": "Date",
             "reqd": 1,
-			"default":frappe.datetime.get_today()
+			"default":frappe.datetime.month_end()
 		},
 		{
 			"fieldname":"supplier",
