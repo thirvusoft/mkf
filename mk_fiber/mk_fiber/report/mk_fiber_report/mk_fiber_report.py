@@ -14,7 +14,13 @@ def throw_error(item):
 def get(filters):
 	pr_filters={}
 	pr_filters['docstatus']=1
-	pr_filters['posting_date']=['between', (filters['from_date'], filters['to_date'])]
+	if(filters.get('from_date') and filters.get('to_date')):
+		pr_filters['posting_date']=['between', (filters['from_date'], filters['to_date'])]
+	if(filters.get('supplier')):
+		pr_filters['supplier']=filters['supplier']
+	if(filters.get('purchase_receipt_no')):
+		pr_filters['name']=filters['purchase_receipt_no']
+	
 	
 	se_filters={}
 	se_filters['docstatus']=1
@@ -274,7 +280,7 @@ def get_columns(filters):
 			'width':120
 		},
 		{
-			'label': _("Profit Percentage"),
+			'label': _("Profit Amount"),
 			'fieldname':'profit',
 			'fieldtype':'Currency',
 			'width':150
