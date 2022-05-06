@@ -82,25 +82,31 @@ doctype_js = {"Stock Entry" : "mk_fiber/custom/js/stockentry.js",
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+	"Payroll Entry": "mk_fiber.mk_fiber.custom.python.salary_slip.stock_entry"
+	}
 
 # Document Events
 # ---------------
 # Hook on document methods and events
 
 doc_events = {
-	"Employee": {
-		# "on_update": "method",
-		# "on_cancel": "method",
-		# "on_trash": "method",
-		"before_save": "mk_fiber.mk_fiber.custom.python.employee.auto_name",
-	},
+	# "Employee": {
+	# 	# "on_update": "method",
+	# 	# "on_cancel": "method",
+	# 	# "on_trash": "method",
+	# 	"before_save": "mk_fiber.mk_fiber.custom.python.employee.auto_name",
+	# },
 	"Purchase Receipt":{
 		"on_submit":["mk_fiber.mk_fiber.custom.python.batch.purchase_receipt","mk_fiber.mk_fiber.custom.python.employee_advance.create_employee_advance"]
 
 		},
+	"Payment Entry":{
+		"on_submit":["mk_fiber.mk_fiber.custom.python.payment_entry.create_additional_salary"]
+	},
+	"Employee Advance":{
+		"on_submit":["mk_fiber.mk_fiber.custom.python.employee_advance.create_payment_entry"]
+	},
 	"Stock Entry":{
 		"on_submit":["mk_fiber.mk_fiber.custom.python.batch.stock_entry","mk_fiber.mk_fiber.custom.python.employee_advance.create_employee_advance"]
 	}
