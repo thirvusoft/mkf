@@ -10,8 +10,7 @@
   "total_count",
   "cost_per_piece",
   "total_cost",
-  "paid_amount",
-  "working_process"
+  "paid_amount"
  ],
  "fields": [
   {
@@ -50,18 +49,12 @@
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Paid Amount"
-  },
-  {
-   "fieldname": "working_process",
-   "fieldtype": "Link",
-   "label": "Working Process",
-   "options": "Working Process"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-05-09 14:09:37.430491",
+ "modified": "2022-05-09 14:33:52.216791",
  "modified_by": "Administrator",
  "module": "Mk Fiber",
  "name": "Labour Details",
