@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "labour_name",
+  "working__process",
   "total_count",
   "cost_per_piece",
   "total_cost",
@@ -16,7 +17,6 @@
   {
    "fieldname": "labour_name",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "label": "Labour Name",
    "options": "Employee",
    "reqd": 1
@@ -25,7 +25,6 @@
    "default": "0",
    "fieldname": "total_count",
    "fieldtype": "Int",
-   "in_list_view": 1,
    "label": "Total Count",
    "reqd": 1
   },
@@ -33,28 +32,36 @@
    "default": "0",
    "fieldname": "cost_per_piece",
    "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "Cost Per Piece "
+   "label": "Cost Per Piece ",
+   "reqd": 1
   },
   {
    "default": "0",
    "fieldname": "total_cost",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Total Cost"
+   "label": "Total Cost",
+   "reqd": 1
   },
   {
    "default": "0",
    "fieldname": "paid_amount",
    "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "Paid Amount"
+   "label": "Paid Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "working__process",
+   "fieldtype": "Link",
+   "label": "Working  Process",
+   "options": "Working Process",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-05-09 14:33:52.216791",
+ "modified": "2022-05-09 18:04:14.134690",
  "modified_by": "Administrator",
  "module": "Mk Fiber",
  "name": "Labour Details",
