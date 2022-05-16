@@ -29,9 +29,24 @@ def execute(filters=None):
 								   order by posting_date;
 						""".format(conditions))
 	
-	columns, data = get_columns(), report_data
-	return columns, data
-
+	data = [list(i) for i in report_data]
+	emp=[frappe.get_all("Employee",fields=['employee_name'],filters={'name':i[0]})[0]['employee_name'] for i in data]
+	for i in range(len(emp)):data[i][0] = str(emp[i])
+	final_data = []
+	if(len(data)):
+		for i in range(len(data)-1):
+			if(i<=len(data)):
+				final_data.append(data[i])
+		final_data.append(data[-1])
+		total = [" " for i in range(9)]
+		total[0] = "<b style=color:Red;>""Total""</b>"
+		total[2] = sum(data[i][2] for i in range(len(data)))
+		total[3] = round(sum(data[i][3] for i in range(len(data))) / len(data),2)
+		total[4] = sum(data[i][4] for i in range(len(data)))
+		total[5] = sum(data[i][5] for i in range(len(data)))
+		final_data.append(total)
+	columns = get_columns()
+	return columns, final_data
 def get_columns():
 	columns = [
 		_("Labour Name") + ":Link/Employee:130",
