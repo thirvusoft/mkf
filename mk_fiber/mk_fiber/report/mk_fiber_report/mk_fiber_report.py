@@ -160,7 +160,8 @@ def batch_final_dict(batch_supplier_ratio, batch_supplier_qty, batch_stock_entry
 		for sup in batch_supplier_qty[bat]:
 			res={}
 			res['supplier']=sup
-			res['item_name']=frappe.get_value('Batch', bat, 'item_name')
+			item_code = frappe.get_value('Batch', bat, 'item')
+			res['item_code']=frappe.get_value('Item', item_code, 'item_name')
 			res['batch']=bat
 			
 			res['qty']=batch_supplier_qty[bat][sup]
@@ -257,7 +258,7 @@ def get_columns(filters):
 		},
 		{
 			'label': _("Item Name"),
-			'fieldname':'item_name',
+			'fieldname':'item_code',
 			'fieldtype':'Link',
 			'options':'Item',
 			'width':120
