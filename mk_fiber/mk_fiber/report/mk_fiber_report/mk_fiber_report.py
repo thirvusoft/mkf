@@ -1,5 +1,5 @@
 import frappe
-from frappe import _
+from frappe import _, errprint
 import copy
 
 
@@ -65,6 +65,8 @@ def get(filters):
 	batch_si_rate={}
 	batch_stock_entry={}
 	batch_labour_cost={}
+	pr_date={}
+	si_date={}
 	
 	for doc in pr: 
 		pr_doc=frappe.get_doc('Purchase Receipt', doc)
@@ -89,11 +91,10 @@ def get(filters):
 						batch=ts_batch
 					batch_pr_rate[batch]=0
 				batch_pr_rate[row.batch_no]+=row.amount
-				
+
 				if(batch not in pr_qty):
 					pr_qty[batch]=0
 				pr_qty[batch]+=row.qty
-		
 		for batch in pr_qty:
 			if(batch not in batch_labour_cost):
 				batch_labour_cost[batch]={}
@@ -114,7 +115,6 @@ def get(filters):
 				if(ts_batch):
 					batch=ts_batch
 				batch_si_rate[batch]=0
-			batch_si_rate[batch]+=row.amount
 	
 	
 	
@@ -160,7 +160,7 @@ def batch_final_dict(batch_supplier_ratio, batch_supplier_qty, batch_stock_entry
 		for sup in batch_supplier_qty[bat]:
 			res={}
 			res['supplier']=sup
-			res['item_code']=frappe.get_value('Batch', bat, 'item')
+			res['item_name']=frappe.get_value('Batch', bat, 'item_name')
 			res['batch']=bat
 			
 			res['qty']=batch_supplier_qty[bat][sup]
@@ -179,10 +179,53 @@ def batch_final_dict(batch_supplier_ratio, batch_supplier_qty, batch_stock_entry
 			
 			res['purchase_amt']="%.2f"%purchase_amt
 			res['sales_amt']="%.2f"%sales_amt
-			res['profit']="%.2f"%(sales_amt-purchase_amt)
 			res['wages']="%.2f"%(((batch_labour_cost.get(bat) or {}).get(item_list['wages']) or 0)*batch_supplier_ratio[bat][sup]/100)
+			wages=(((batch_labour_cost.get(bat) or {}).get(item_list['wages']) or 0)*batch_supplier_ratio[bat][sup]/100)
+			res['profit']="%.2f"%(sales_amt-(purchase_amt+wages))
 			final_dict.append(res)
-	return final_dict
+	final_dict.sort(key= lambda x: x['batch'])
+	final_dict_1 = []
+	if(len(final_dict)):
+		keys=list(final_dict[0].keys())
+		start = 0
+		for i in range(len(final_dict)-1):
+			if (final_dict[i]['batch'] != final_dict[i+1]['batch']):
+				final_dict_1.append(final_dict[i])
+				total = {keys[i]:" " for i in range(9)}
+				total['batch'] = "<b style=color:orange;>""Total""</b>"
+				total['qty'] = sum(float(final_dict[i]['qty']) for i in range(start,i+1))
+				total['uri_kg'] = sum(float(final_dict[i]['uri_kg']) for i in range(start,i+1))
+				total['uri_nos'] = sum(float(final_dict[i]['uri_nos']) for i in range(start,i+1))
+				total['copra'] = sum(float(final_dict[i]['copra']) for i in range(start,i+1))
+				total['copra_percent'] = sum(float(final_dict[i]['copra_percent']) for i in range(start,i+1))
+				total['shell'] = sum(float(final_dict[i]['shell']) for i in range(start,i+1))
+				total['husk'] = sum(float(final_dict[i]['husk']) for i in range(start,i+1))
+				total['purchase_amt'] = sum(float(final_dict[i]['purchase_amt']) for i in range(start,i+1))
+				total['sales_amt'] = sum(float(final_dict[i]['sales_amt']) for i in range(start,i+1))
+				total['wages'] = sum(float(final_dict[i]['wages']) for i in range(start,i+1))
+				total['profit'] = sum(float(final_dict[i]['profit']) for i in range(start,i+1))
+				
+				final_dict_1.append(total)
+				start = i+1	
+			else:
+				final_dict_1.append(final_dict[i])
+				
+		final_dict_1.append(final_dict[-1])
+		total = {keys[i]:" " for i in range(9)}
+		total['batch'] = "<b style=color:orange;>""Total""</b>"
+		total['qty'] = sum(float(final_dict[i]['qty']) for i in range(start,len(final_dict)))
+		total['uri_kg'] = sum(float(final_dict[i]['uri_kg']) for i in range(start,len(final_dict)))
+		total['uri_nos'] = sum(float(final_dict[i]['uri_nos']) for i in range(start,len(final_dict)))
+		total['copra'] = sum(float(final_dict[i]['copra']) for i in range(start,len(final_dict)))
+		total['copra_percent'] = sum(float(final_dict[i]['copra_percent']) for i in range(start,len(final_dict)))
+		total['shell'] = sum(float(final_dict[i]['shell']) for i in range(start,len(final_dict)))
+		total['husk'] = sum(float(final_dict[i]['husk']) for i in range(start,len(final_dict)))
+		total['purchase_amt'] = sum(float(final_dict[i]['purchase_amt']) for i in range(start,len(final_dict)))
+		total['sales_amt'] = sum(float(final_dict[i]['sales_amt']) for i in range(start,len(final_dict)))
+		total['wages'] = sum(float(final_dict[i]['wages']) for i in range(start,len(final_dict)))
+		total['profit'] = sum(float(final_dict[i]['profit']) for i in range(start,len(final_dict)))
+		final_dict_1.append(total)
+	return final_dict_1
 
 
 def supplier_ratio(batch_qty, batch_supplier_qty):
@@ -213,14 +256,14 @@ def get_columns(filters):
 			'width':120
 		},
 		{
-			'label': _("Item Code"),
-			'fieldname':'item_code',
+			'label': _("Item Name"),
+			'fieldname':'item_name',
 			'fieldtype':'Link',
 			'options':'Item',
 			'width':120
 		},
 		{
-			'label': _("Batch No"),
+			'label': _("Lot No"),
 			'fieldname':'batch',
 			'fieldtype':'Data',
 			'width':120
@@ -280,16 +323,17 @@ def get_columns(filters):
 			'width':120
 		},
 		{
+			'label': _("Wages"),
+			'fieldname':'wages',
+			'fieldtype':'Currency',
+			'width':120
+		},
+		{
 			'label': _("Profit Amount"),
 			'fieldname':'profit',
 			'fieldtype':'Currency',
 			'width':150
 		},
-		{
-			'label': _("Wages"),
-			'fieldname':'wages',
-			'fieldtype':'Currency',
-			'width':120
-		}
+		
 	]
 	return columns
