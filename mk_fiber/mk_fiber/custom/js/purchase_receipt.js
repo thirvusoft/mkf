@@ -25,6 +25,15 @@ frappe.ui.form.on("Purchase Receipt",{
         ts_new_row.amount=ts_total_amount
         refresh_field("ts_additional_cost");
     }
+    },
+    on_submit:async function(frm){
+        for(let row=0;row<cur_frm.doc.items.length;row++){
+            let cdt = cur_frm.doc.items[row].doctype
+            let cdn = cur_frm.doc.items[row].name
+            let data = locals[cdt][cdn]
+            await frappe.db.set_value(cdt, cdn, 'ts_batch', data.batch_no)
+        }
+        await refresh_field('items')
     }
 })
 

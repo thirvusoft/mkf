@@ -14,6 +14,9 @@ def autoname(self,event):
                 if(row.s_warehouse):
                     batch_name=row.batch_no
             if(batch_name):
+                p_batch=frappe.get_value('Batch', batch_name, 'parent_batch_id')
+                if(p_batch):
+                    batch_name=p_batch
                 if(not frappe.db.sql("select * from `tabSeries` where name=%s ",batch_name)):
                     frappe.db.sql("INSERT INTO `tabSeries` (`name`, `current`) VALUES (%s, 0)", batch_name)
                 frappe.db.sql("UPDATE `tabSeries` SET `current` = `current` + 1 where name=%s",batch_name)
