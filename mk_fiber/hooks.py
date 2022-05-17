@@ -105,6 +105,9 @@ doc_events = {
 	},
 	"Sales Invoice":{
 		"on_submit":"mk_fiber.mk_fiber.custom.python.batch.sales_invoice"
+	},
+	"Batch":{
+		"autoname": "mk_fiber.mk_fiber.custom.python.lot_series.autoname"
 	}
 }
 
