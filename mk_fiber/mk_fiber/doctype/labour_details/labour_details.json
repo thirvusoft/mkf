@@ -47,8 +47,8 @@
    "default": "0",
    "fieldname": "paid_amount",
    "fieldtype": "Currency",
-   "label": "Paid Amount",
-   "reqd": 1
+   "in_list_view": 1,
+   "label": "Paid Amount"
   },
   {
    "fieldname": "working__process",
@@ -61,7 +61,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-05-09 18:04:14.134690",
+ "modified": "2022-05-17 19:22:17.338703",
  "modified_by": "Administrator",
  "module": "Mk Fiber",
  "name": "Labour Details",

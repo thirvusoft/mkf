@@ -21,13 +21,13 @@ frappe.ui.form.on("Stock Entry",{
         var ts_data=locals[cdt][cdn]
         if(ts_data.stock_entry_type=="Repack"){
             var ts_total_amount=0
-            for(var i=0;i<ts_data.labour_details.length;i++){
+            for(var i=0;i<(ts_data.labour_details?ts_data.labour_details:[]).length;i++){
                 ts_total_amount=ts_total_amount+ts_data.labour_details[i].total_cost
             }
             frm.clear_table("additional_costs")
             var ts_new_row=frm.add_child("additional_costs");
             ts_new_row.expense_account="Expenses Included In Valuation - MF",
-            ts_new_row.description="Purchase Receipt"
+            ts_new_row.description=cur_frm.doc.doctype
             ts_new_row.amount=ts_total_amount
             refresh_field("additional_costs");
         }

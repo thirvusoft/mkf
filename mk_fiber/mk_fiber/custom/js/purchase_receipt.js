@@ -13,13 +13,13 @@ frappe.ui.form.on("Purchase Receipt",{
         var ts_data=locals[cdt][cdn]
         var ts_total_amount=0
         if(ts_data.ts_extra_charges){
-        for(var i=0;i<ts_data.ts_extra_charges.length;i++){
+        for(var i=0;i<(ts_data.ts_extra_charges?ts_data.ts_extra_charges:[]).length;i++){
             ts_total_amount=ts_total_amount+ts_data.ts_extra_charges[i].ts_amount
         }
         frm.clear_table("ts_additional_cost")
         var ts_new_row=frm.add_child("ts_additional_cost");
         ts_new_row.expense_account="Expenses Included In Valuation - MF",
-        ts_new_row.description="Purchase Receipt"
+        ts_new_row.description=cur_frm.doc.doctype
         ts_new_row.base_amount=ts_total_amount
         ts_new_row.exchange_rate=ts_total_amount
         ts_new_row.amount=ts_total_amount
@@ -51,13 +51,13 @@ frappe.ui.form.on("Purchase Receipt",{
         var ts_data=locals[cdt][cdn]
         if(ts_data.supplier){
             var ts_total_amount=0
-            for(var i=0;i<ts_data.labour_details.length;i++){
+            for(var i=0;i<(ts_data.labour_details?ts_data.labour_details:[]).length;i++){
                 ts_total_amount=ts_total_amount+ts_data.labour_details[i].total_cost
             }
             frm.clear_table("ts_additional_cost")
             var ts_new_row=frm.add_child("ts_additional_cost");
             ts_new_row.expense_account="Expenses Included In Valuation - MF",
-            ts_new_row.description="Purchase Receipt"
+            ts_new_row.description=cur_frm.doc.doctype
             ts_new_row.amount=ts_total_amount
             ts_data.total_additional_costs = ts_total_amount
             refresh_field("ts_additional_cost");
