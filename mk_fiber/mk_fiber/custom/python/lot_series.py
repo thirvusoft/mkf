@@ -6,6 +6,20 @@ def iter_all_strings():
 				for s in itertools.product(ascii_uppercase, repeat=size):
 					yield "".join(s)
 def autoname(self,event):
+    if(self.reference_doctype=="Stock Entry"):
+        doc=frappe.get_doc('Stock Entry', self.reference_name)
+        if(doc.stock_entry_type=='Repack'):
+            batch_name=''
+            for row in doc.items:
+                if(row.s_warehouse):
+                    batch_name=row.batch_no
+            if(batch_name):
+                if(not frappe.db.sql("select * from `tabSeries` where name=%s ",batch_name)):
+                    frappe.db.sql("INSERT INTO `tabSeries` (`name`, `current`) VALUES (%s, 0)", batch_name)
+                frappe.db.sql("UPDATE `tabSeries` SET `current` = `current` + 1 where name=%s",batch_name)
+                self.name=batch_name+'-'+str(frappe.db.sql("select `current` from `tabSeries` where name=%s ",batch_name)[0][0])
+        return
+    
     max_series=150
     series = []
     for s in iter_all_strings():
