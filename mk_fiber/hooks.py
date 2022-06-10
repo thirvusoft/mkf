@@ -32,7 +32,10 @@ app_license = "MIT"
 
 # include js in doctype views
 doctype_js = {"Stock Entry" : "mk_fiber/custom/js/stockentry.js",
-"Purchase Receipt":"mk_fiber/custom/js/purchase_receipt.js"}
+"Purchase Receipt":"mk_fiber/custom/js/purchase_receipt.js",
+"Purchase Invoice":"mk_fiber/custom/js/purchase_invoice.js",
+"Sales Invoice":"mk_fiber/custom/js/sales_invoice.js",
+"Delivery Note":"mk_fiber/custom/js/delivery_note.js",}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -92,22 +95,53 @@ doctype_js = {"Stock Entry" : "mk_fiber/custom/js/stockentry.js",
 
 doc_events = {
 	"Employee": {
-		# "on_update": "method",
-		# "on_cancel": "method",
-		# "on_trash": "method",
 		"before_save": "mk_fiber.mk_fiber.custom.python.employee.auto_name",
 	},
-	"Purchase Receipt":{
-		"on_submit":["mk_fiber.mk_fiber.custom.python.batch.purchase_receipt","mk_fiber.mk_fiber.custom.python.employee_advance.create_employee_advance"]
-	},
 	"Stock Entry":{
-		"on_submit":["mk_fiber.mk_fiber.custom.python.batch.stock_entry","mk_fiber.mk_fiber.custom.python.employee_advance.create_employee_advance"]
+		"on_submit":["mk_fiber.mk_fiber.custom.python.batch.stock_entry",
+		# "mk_fiber.mk_fiber.custom.python.employee_advance.create_employee_advance",
+		"mk_fiber.mk_fiber.custom.python.landed_cost_voucher.creating_journal_entry",
+		"mk_fiber.mk_fiber.custom.python.stock_reconciliation.creating_stock_reconciliation"
+		],
+		"on_cancel":"mk_fiber.mk_fiber.custom.python.landed_cost_voucher.removing_journal_entry",
+		"validate":["mk_fiber.mk_fiber.custom.python.landed_cost_voucher.total_amount_calculator",
+		]
+
+
 	},
 	"Sales Invoice":{
-		"on_submit":"mk_fiber.mk_fiber.custom.python.batch.sales_invoice"
+		"on_submit":[
+					"mk_fiber.mk_fiber.custom.python.batch.sales_invoice",
+					"mk_fiber.mk_fiber.custom.python.landed_cost_voucher.creating_journal_entry",
+					],
+		"on_cancel":"mk_fiber.mk_fiber.custom.python.landed_cost_voucher.removing_journal_entry",
+		"validate":"mk_fiber.mk_fiber.custom.python.landed_cost_voucher.total_amount_calculator"
+	},
+	"Delivery Note":{
+		"on_submit":"mk_fiber.mk_fiber.custom.python.landed_cost_voucher.creating_journal_entry",
+		"on_cancel":"mk_fiber.mk_fiber.custom.python.landed_cost_voucher.removing_journal_entry",
+		"validate":"mk_fiber.mk_fiber.custom.python.landed_cost_voucher.total_amount_calculator"
 	},
 	"Batch":{
 		"autoname": "mk_fiber.mk_fiber.custom.python.lot_series.autoname"
+	},
+	"Purchase Receipt":{
+		"on_submit":["mk_fiber.mk_fiber.custom.python.landed_cost_voucher.creating_journal_entry",
+					 "mk_fiber.mk_fiber.custom.python.landed_cost_voucher.creating_landed_cost_voucher",
+					 "mk_fiber.mk_fiber.custom.python.batch.purchase_receipt",
+					#  "mk_fiber.mk_fiber.custom.python.employee_advance.create_employee_advance"
+					 ],
+		"on_cancel":"mk_fiber.mk_fiber.custom.python.landed_cost_voucher.removing_journal_entry",
+		"validate":"mk_fiber.mk_fiber.custom.python.landed_cost_voucher.total_amount_calculator"
+	},
+	"Purchase Invoice":{
+		"on_submit":["mk_fiber.mk_fiber.custom.python.landed_cost_voucher.creating_journal_entry",
+					 "mk_fiber.mk_fiber.custom.python.landed_cost_voucher.creating_landed_cost_voucher"],
+		"on_cancel":"mk_fiber.mk_fiber.custom.python.landed_cost_voucher.removing_journal_entry",
+		"validate":"mk_fiber.mk_fiber.custom.python.landed_cost_voucher.total_amount_calculator"
+	},
+	"Stock Reconciliation":{
+		"validate":"mk_fiber.mk_fiber.custom.python.stock_reconciliation.calculating_difference_value"
 	}
 }
 
