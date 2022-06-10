@@ -82,7 +82,7 @@ function cost(frm,cdt,cdn){
     frappe.model.set_value(cdt,cdn,'ts_amount',row.ts_total_count*row.ts_cost_per_price)
 }
 
-frappe.ui.form.on("TS Landed Cost Voucher",{
+frappe.ui.form.on("TS Landed Cost Voucher Mk",{
 	ts_make_journal_entry:function(frm,cdt,cdn){
 		var ts_data=locals[cdt][cdn]
 		var ts_total_amount=ts_data.ts_amount
