@@ -77,7 +77,7 @@ def get(filters):
 	for doc in pr: 
 		pr_doc=frappe.get_doc('Purchase Receipt', doc)
 		pr_qty={}
-		additional_cost=pr_doc.total_additional_costs
+		additional_cost=pr_doc.ts_total_amount
 		for row in pr_doc.items:
 			if(row.batch_no):
 				if(row.batch_no not in batch_qty):
@@ -148,7 +148,7 @@ def get(filters):
 					
 			if(row.s_warehouse and run):
 				run=False
-				total_cost=se_doc.total_additional_costs
+				total_cost=se_doc.ts_total_amount
 				
 				if(batch not in batch_labour_cost):
 					batch_labour_cost[batch]={}
