@@ -1,0 +1,195 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-06-09 09:25:48.492980",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "ts_expence_account",
+  "ts_account",
+  "ts_party_type",
+  "ts_party_name",
+  "ts_working__process",
+  "ts_total_count",
+  "ts_cost_per_price",
+  "ts_amount",
+  "ts_description",
+  "column_break_6",
+  "ts_make_journal_entry",
+  "ts_createing_je",
+  "ts_mode_of_payment",
+  "ts_payment_account_head",
+  "ts_paying_amount",
+  "ts_paid_amount",
+  "ts_remaining_amount_to_be_paid",
+  "ts_status",
+  "ts_journal_entry"
+ ],
+ "fields": [
+  {
+   "columns": 2,
+   "fieldname": "ts_expence_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Expense Account",
+   "options": "Account",
+   "read_only_depends_on": "eval:doc.ts_journal_entry",
+   "reqd": 1
+  },
+  {
+   "columns": 2,
+   "fieldname": "ts_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Account",
+   "options": "Account",
+   "read_only_depends_on": "eval:doc.ts_journal_entry",
+   "reqd": 1
+  },
+  {
+   "columns": 2,
+   "fieldname": "ts_party_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Party Type",
+   "options": "DocType",
+   "read_only_depends_on": "eval:doc.ts_journal_entry"
+  },
+  {
+   "columns": 2,
+   "fieldname": "ts_party_name",
+   "fieldtype": "Dynamic Link",
+   "in_list_view": 1,
+   "label": "Party Name",
+   "mandatory_depends_on": "doc.ts_party_type!=\"\"",
+   "options": "ts_party_type",
+   "read_only_depends_on": "eval:doc.ts_journal_entry"
+  },
+  {
+   "columns": 2,
+   "fieldname": "ts_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount",
+   "read_only_depends_on": "eval:doc.ts_journal_entry && doc.ts_cost_per_price",
+   "reqd": 1
+  },
+  {
+   "fieldname": "ts_description",
+   "fieldtype": "Small Text",
+   "label": "Description",
+   "read_only_depends_on": "eval:doc.ts_journal_entry"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break",
+   "read_only_depends_on": "eval:doc.ts_journal_entry"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:!doc.ts_journal_entry",
+   "fieldname": "ts_make_journal_entry",
+   "fieldtype": "Button",
+   "label": "Make Journal Entry",
+   "read_only_depends_on": "eval:doc.ts_journal_entry"
+  },
+  {
+   "default": "0",
+   "fieldname": "ts_createing_je",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Createing JE",
+   "read_only": 1,
+   "read_only_depends_on": "eval:doc.ts_journal_entry"
+  },
+  {
+   "depends_on": "eval:doc.ts_createing_je==1",
+   "fieldname": "ts_mode_of_payment",
+   "fieldtype": "Link",
+   "label": "Mode of Payment",
+   "mandatory_depends_on": "eval:doc.ts_createing_je==1",
+   "options": "Mode of Payment",
+   "read_only_depends_on": "eval:doc.ts_journal_entry"
+  },
+  {
+   "depends_on": "eval:doc.ts_createing_je==1",
+   "fieldname": "ts_payment_account_head",
+   "fieldtype": "Link",
+   "label": "Payment Account Head",
+   "mandatory_depends_on": "eval:doc.ts_createing_je==1",
+   "options": "Account",
+   "read_only_depends_on": "eval:doc.ts_journal_entry"
+  },
+  {
+   "depends_on": "eval:doc.ts_createing_je==1 && doc.docstatus==0 && !doc.ts_journal_entry",
+   "fetch_from": "doc.ts_amount",
+   "fieldname": "ts_paying_amount",
+   "fieldtype": "Currency",
+   "label": "Paying Amount",
+   "mandatory_depends_on": "eval:doc.ts_createing_je==1",
+   "read_only_depends_on": "eval:doc.ts_journal_entry"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "ts_paid_amount",
+   "fieldtype": "Currency",
+   "label": "Paid Amount",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.docstatus==0 && !doc.ts_journal_entry",
+   "fieldname": "ts_remaining_amount_to_be_paid",
+   "fieldtype": "Currency",
+   "label": "Remaining Amount To Be Paid",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.ts_createing_je==1",
+   "fieldname": "ts_status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "mandatory_depends_on": "eval:doc.ts_createing_je==1",
+   "options": "Draft\nSubmit",
+   "read_only_depends_on": "eval:doc.ts_journal_entry"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "ts_journal_entry",
+   "fieldtype": "Data",
+   "label": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ts_total_count",
+   "fieldtype": "Int",
+   "label": "Total Count",
+   "mandatory_depends_on": "eval:doc.ts_cost_per_price",
+   "read_only_depends_on": "eval:doc.ts_journal_entry"
+  },
+  {
+   "fieldname": "ts_cost_per_price",
+   "fieldtype": "Int",
+   "label": "Cost Per Price",
+   "read_only_depends_on": "eval:doc.ts_journal_entry"
+  },
+  {
+   "fieldname": "ts_working__process",
+   "fieldtype": "Link",
+   "label": "Working  Process",
+   "options": "Working Process",
+   "read_only_depends_on": "eval:doc.ts_journal_entry"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-06-09 09:36:17.684224",
+ "modified_by": "Administrator",
+ "module": "Mk Fiber",
+ "name": "TS Landed Cost Voucher Mk",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
