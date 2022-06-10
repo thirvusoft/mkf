@@ -1,57 +1,28 @@
-frappe.ui.form.on("Purchase Receipt",{
-    onload:function(frm,cdt,cdn){
-        if(cur_frm.is_new()==1){
-            frappe.model.set_value(cdt,cdn,"set_posting_time",1)
-            frappe.model.set_value(cdt,cdn,"posting_date","")
-            frappe.model.set_value(cdt,cdn,"posting_time","")
-        }
-    }
-})
-
-frappe.ui.form.on("Purchase Receipt",{
-    on_submit:async function(frm){
-        for(let row=0;row<cur_frm.doc.items.length;row++){
-            let cdt = cur_frm.doc.items[row].doctype
-            let cdn = cur_frm.doc.items[row].name
-            let data = locals[cdt][cdn]
-            await frappe.db.set_value(cdt, cdn, 'ts_batch', data.batch_no)
-        }
-        await refresh_field('items')
-    }
-})
-
 var main_data
-frappe.ui.form.on("Purchase Receipt",{
+frappe.ui.form.on("Sales Invoice",{
 	onload:function(frm,cdt,cdn){
-		main_data=locals[cdt][cdn]
-		if(main_data.ts_landed_cost_voucher_table){
-			if(main_data.ts_duplicate==1){
-				if(cur_frm.is_new()){
-					frm.clear_table("ts_landed_cost_voucher_table")
-					frm.set_value("cost_center","")
-					frm.set_value("ts_total_amount","")
-					frm.set_value("ts_distribute_charges_based_on","Qty")
-				}
-			}
-			else{
-				var landed_table=main_data.ts_landed_cost_voucher_table
-				for(var i=0;i<landed_table.length;i++){
-					if(main_data.items){
-						var items=main_data.items
-						for(var j=0;j<items.length;j++){
-							if(main_data.items[j].purchase_invoice){
-								frm.set_value("ts_duplicate",1)
-								i=landed_table.length
-								break
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	validate:function(frm){
-		frm.set_value("ts_duplicate",1)
+        if(cur_frm.is_new()){
+            main_data=locals[cdt][cdn]
+            if(main_data.ts_landed_cost_voucher_table){
+                var landed_table=main_data.ts_landed_cost_voucher_table
+                for(var i=0;i<landed_table.length;i++){
+                    if(main_data.items){
+                        var items=main_data.items
+                        for(var j=0;j<items.length;j++){
+                            if(main_data.items[j].delivery_note){
+                            }
+                            else{
+                                frm.clear_table("ts_landed_cost_voucher_table")
+                                frm.set_value("ts_total_amount","")
+                                frm.set_value("ts_distribute_charges_based_on","Qty")
+                                i=landed_table.length
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+        }
 	},
 	setup:function(frm){
 		frm.set_query("ts_account","ts_landed_cost_voucher_table", function() {
@@ -65,11 +36,6 @@ frappe.ui.form.on("Purchase Receipt",{
 			}
 		})
 		frm.set_query("ts_payment_account_head","ts_landed_cost_voucher_table", function() {
-			return {
-				filters: {"company":frm.doc.company}
-			}
-		})
-		frm.set_query("cost_center",function() {
 			return {
 				filters: {"company":frm.doc.company}
 			}
@@ -110,6 +76,7 @@ frappe.ui.form.on("TS Landed Cost Voucher Mk",{
 		var ts_data=locals[cdt][cdn]
 		var ts_remainig_amount=ts_data.ts_amount-ts_data.ts_paying_amount
 		frappe.model.set_value(cdt, cdn, "ts_remaining_amount_to_be_paid", ts_remainig_amount)
+
 	},
 	ts_account:function(frm,cdt,cdn){
 		var ts_data=locals[cdt][cdn]
@@ -134,29 +101,10 @@ frappe.ui.form.on("TS Landed Cost Voucher Mk",{
 			frappe.model.set_value(cdt, cdn, "ts_party_name", "")
 		}
 	},
-	ts_total_count:function(frm,cdt,cdn){
+    ts_total_count:function(frm,cdt,cdn){
         cost(frm,cdt,cdn);
     },
     ts_cost_per_price:function(frm,cdt,cdn){
         cost(frm,cdt,cdn);
     }
 })
-
-// frappe.ui.form.on("Purchase Receipt",{
-//     before_save:function(frm,cdt,cdn){
-//         var ts_data=locals[cdt][cdn]
-//         if(ts_data.supplier){
-//             var ts_total_amount=0
-//             for(var i=0;i<(ts_data.labour_details?ts_data.labour_details:[]).length;i++){
-//                 ts_total_amount=ts_total_amount+ts_data.labour_details[i].total_cost
-//             }
-//             frm.clear_table("ts_additional_cost")
-//             var ts_new_row=frm.add_child("ts_additional_cost");
-//             ts_new_row.expense_account="Expenses Included In Valuation - MF",
-//             ts_new_row.description=cur_frm.doc.doctype
-//             ts_new_row.amount=ts_total_amount
-//             ts_data.total_additional_costs = ts_total_amount
-//             refresh_field("ts_additional_cost");
-//         }
-//     }
-// })
