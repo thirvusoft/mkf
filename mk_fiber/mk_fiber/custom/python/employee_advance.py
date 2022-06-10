@@ -9,13 +9,14 @@ def create_employee_advance(doc,action):
         else:
             frappe.throw("Set Default Employee Advance Account")
     for row in doc.labour_details:
-        new_doc = frappe.new_doc("Employee Advance")
-        new_doc.update({
-            'employee': row.labour_name,
-            'exchange_rate': "1",
-            'purpose':row.working_process,
-            'advance_amount': row.paid_amount,
-            'advance_account': advance_acc
-        })
-        new_doc.insert()
-        new_doc.submit()
+        if(row.paid_amount):
+            new_doc = frappe.new_doc("Employee Advance")
+            new_doc.update({
+                'employee': row.labour_name,
+                'exchange_rate': "1",
+                'purpose':row.working__process,
+                'advance_amount': row.paid_amount,
+                'advance_account': advance_acc
+            })
+            new_doc.insert()
+            new_doc.submit()
