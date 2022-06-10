@@ -98,9 +98,7 @@
    "default": "0",
    "fieldname": "ts_createing_je",
    "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Createing JE",
-   "read_only": 1,
+   "label": " ",
    "read_only_depends_on": "eval:doc.ts_journal_entry"
   },
   {
@@ -132,13 +130,14 @@
   },
   {
    "allow_on_submit": 1,
+   "depends_on": "eval:doc.ts_createing_je==1",
    "fieldname": "ts_paid_amount",
    "fieldtype": "Currency",
    "label": "Paid Amount",
    "read_only": 1
   },
   {
-   "depends_on": "eval:doc.docstatus==0 && !doc.ts_journal_entry",
+   "depends_on": "eval:doc.docstatus==0 && !doc.ts_journal_entry && doc.ts_createing_je==1",
    "fieldname": "ts_remaining_amount_to_be_paid",
    "fieldtype": "Currency",
    "label": "Remaining Amount To Be Paid",
@@ -184,7 +183,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-06-09 09:36:17.684224",
+ "modified": "2022-06-10 18:01:35.681995",
  "modified_by": "Administrator",
  "module": "Mk Fiber",
  "name": "TS Landed Cost Voucher Mk",
