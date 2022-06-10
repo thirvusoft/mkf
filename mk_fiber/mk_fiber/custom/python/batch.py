@@ -17,8 +17,8 @@ def purchase_receipt(self,event):
             doc.update({
                 'ts_costing_details':costing_details+[pr_costing]
             })
-            doc.save()
-            frappe.db.commit()
+            # doc.save()
+            # frappe.db.commit()
             run=True
 def stock_entry(self,event):
     for item in self.items:
@@ -87,8 +87,8 @@ def sales_invoice(self,event):
            doc.update({
                "ts_child_batch_details":child_batch_details
            })
-           doc.save()
-   frappe.db.commit()
+#            doc.save()
+#    frappe.db.commit()
 
 
             
