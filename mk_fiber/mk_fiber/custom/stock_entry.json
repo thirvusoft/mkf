@@ -221,7 +221,7 @@
    "name": "Stock Entry-ts_landed_cost_voucher_table",
    "no_copy": 0,
    "non_negative": 0,
-   "options": "TS Landed Cost Voucher",
+   "options": "TS Landed Cost Voucher Mk",
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
