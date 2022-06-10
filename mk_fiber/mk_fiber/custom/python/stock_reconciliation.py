@@ -48,6 +48,7 @@ def creating_stock_reconciliation(document,action):
                 })
                 ts_stock_re_count+=1
                 ts_creator.save()
+                ts_creator.submit()
                 previous_doc=ts_creator
             else:
                 separte_values=calculating_landed_cost_voucher_amount(document,ts_head_wise_total[e])
@@ -84,6 +85,7 @@ def creating_stock_reconciliation(document,action):
                 })
                 ts_stock_re_count+=1
                 ts_creator.save()
+                ts_creator.submit()
                 previous_doc=ts_creator
 
 
