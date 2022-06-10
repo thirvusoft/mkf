@@ -45,7 +45,7 @@ def get(filters):
 	pr=frappe.get_all('Purchase Receipt', filters=pr_filters, pluck='name')
 	se=frappe.get_all('Stock Entry', filters=se_filters, pluck='name')
 	si=frappe.get_all('Sales Invoice', filters=si_filters, pluck='name')
-	
+
 	pi_filters={}
 	pi_filters['docstatus']=1
 	pi_filters['purchase_receipt']=['in',pr]
@@ -124,8 +124,9 @@ def get(filters):
 				ts_batch=frappe.db.get_value('Batch', batch, 'parent_batch_id')
 				if(ts_batch):
 					batch=ts_batch
-				batch_si_rate[batch]=0
-	
+				if(batch not in batch_si_rate):
+					batch_si_rate[batch]=0
+				batch_si_rate[batch]+=row.amount
 	
 	
 	
@@ -342,7 +343,7 @@ def get_columns(filters):
 			'label': _("Profit Amount"),
 			'fieldname':'profit',
 			'fieldtype':'Currency',
-			'width':150
+			'width':150,
 		},
 		
 	]
