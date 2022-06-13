@@ -74,7 +74,7 @@ def get(filters):
 			batch_stock_qty[bat['parent_batch_id']]=0
 		batch_stock_qty[bat['parent_batch_id']]+= bat['batch_qty'] * get_stock_balance(bat['item'])
 		
-	frappe.errprint(batch_stock_qty)
+	
 	
 	for doc in pr: 
 		pr_doc=frappe.get_doc('Purchase Receipt', doc)
