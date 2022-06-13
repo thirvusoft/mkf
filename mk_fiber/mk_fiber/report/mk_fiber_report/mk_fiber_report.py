@@ -1,6 +1,8 @@
 import frappe
-from frappe import _, errprint
+from frappe import _
 import copy
+from erpnext.stock.stock_ledger import get_previous_sle
+from frappe.utils import nowdate, nowtime
 
 
 def execute(filters=None):
@@ -64,6 +66,15 @@ def get(filters):
 	batch_si_rate={}
 	batch_stock_entry={}
 	batch_labour_cost={}
+	batch_stock_qty={}
+	
+	batch_list=frappe.get_all('Batch', {'parent_batch_id':['!=', '']}, ['name', 'item', 'parent_batch_id', 'batch_qty'])
+	for bat in batch_list:
+		if(bat['parent_batch_id'] not in batch_stock_qty):
+			batch_stock_qty[bat['parent_batch_id']]=0
+		batch_stock_qty[bat['parent_batch_id']]+= bat['batch_qty'] * get_stock_balance(bat['item'])
+		
+	frappe.errprint(batch_stock_qty)
 	
 	for doc in pr: 
 		pr_doc=frappe.get_doc('Purchase Receipt', doc)
@@ -151,13 +162,13 @@ def get(filters):
 				batch_labour_cost[batch]['wages']+=total_cost
 	
 	batch_supplier_ratio=supplier_ratio(batch_qty, batch_supplier_qty)
-	final_dict=batch_final_dict(filters, batch_qty, batch_supplier_ratio, batch_supplier_qty, batch_stock_entry, batch_si_rate, batch_pr_rate, batch_labour_cost, item_list)
+	final_dict=batch_final_dict(filters, batch_stock_qty, batch_qty, batch_supplier_ratio, batch_supplier_qty, batch_stock_entry, batch_si_rate, batch_pr_rate, batch_labour_cost, item_list)
 	return final_dict
 	
 	
 
 
-def batch_final_dict(filters, batch_qty, batch_supplier_ratio, batch_supplier_qty, batch_stock_entry, batch_si_rate, batch_pr_rate, batch_labour_cost, item_list):
+def batch_final_dict(filters, batch_stock_qty, batch_qty, batch_supplier_ratio, batch_supplier_qty, batch_stock_entry, batch_si_rate, batch_pr_rate, batch_labour_cost, item_list):
 	final_dict=[]
 	pr_filters={}
 	if(filters.get('from_date') and filters.get('to_date')):
@@ -198,6 +209,7 @@ def batch_final_dict(filters, batch_qty, batch_supplier_ratio, batch_supplier_qt
 			res['wages']="%.2f"%(((batch_labour_cost.get(bat) or {}).get(item_list['wages']) or 0)*batch_supplier_ratio[bat][sup]/100)
 			wages=(((batch_labour_cost.get(bat) or {}).get(item_list['wages']) or 0)*batch_supplier_ratio[bat][sup]/100)
 			res['profit']="%.2f"%(sales_amt-(purchase_amt+wages))
+			res['stock_in_hand']="%.2f"%((batch_stock_qty.get(bat) or 0)*batch_supplier_ratio[bat][sup]/100)
 			final_dict.append(res)
 	final_dict.sort(key= lambda x: x['batch'])
 	final_dict_1 = []
@@ -220,7 +232,7 @@ def batch_final_dict(filters, batch_qty, batch_supplier_ratio, batch_supplier_qt
 				total['sales_amt'] =  round(sum(float(final_dict[i]['sales_amt']) for i in range(start,i+1)),2)
 				total['wages'] =  round(sum(float(final_dict[i]['wages']) for i in range(start,i+1)),2)
 				total['profit'] =  round(sum(float(final_dict[i]['profit']) for i in range(start,i+1)),2)
-				
+				total['stock_in_hand'] = round(sum(float(final_dict[i]['stock_in_hand']) for i in range(start,i+1)),2)
 				final_dict_1.append(total)
 				start = i+1	
 			else:
@@ -240,6 +252,7 @@ def batch_final_dict(filters, batch_qty, batch_supplier_ratio, batch_supplier_qt
 		total['sales_amt'] = round(sum(float(final_dict[i]['sales_amt']) for i in range(start,len(final_dict))),2)
 		total['wages'] = round(sum(float(final_dict[i]['wages']) for i in range(start,len(final_dict))),2)
 		total['profit'] = round(sum(float(final_dict[i]['profit']) for i in range(start,len(final_dict))),2)
+		total['stock_in_hand'] = round(sum(float(final_dict[i]['stock_in_hand']) for i in range(start,len(final_dict))),2)
 		final_dict_1.append(total)
 	return final_dict_1
 
@@ -259,6 +272,20 @@ def supplier_ratio(batch_qty, batch_supplier_qty):
 				
 	return batch_supplier_ratio
 
+
+
+def get_stock_balance(item_code):
+	rate=0.0
+	for warehouse in frappe.get_all('Warehouse',pluck='name'):
+		args = {
+			"item_code": item_code,
+			"warehouse": warehouse,
+			"posting_date": nowdate(),
+			"posting_time": nowtime(),
+		}
+		last_entry = get_previous_sle(args)
+		rate+=last_entry.valuation_rate if last_entry else 0.0
+	return rate
 
 
 
@@ -350,6 +377,12 @@ def get_columns(filters):
 			'fieldtype':'Currency',
 			'width':150,
 		},
+		{
+			'label': _("Stock in Hand"),
+			'fieldname':'stock_in_hand',
+			'fieldtype':'Currency',
+			'width':150,
+		}
 		
 	]
 	return columns
