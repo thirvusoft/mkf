@@ -28,5 +28,12 @@ frappe.query_reports["MK Fiber Report"] = {
             "fieldtype": "Link",
             "options": "Purchase Receipt"
 		},
+		{
+			"fieldname":"batch_no",
+            "label": __("Lot"),
+            "fieldtype": "Link",
+            "options": "Batch",
+            "filters":{'parent_batch_id':''}
+		}
 	]
 };
