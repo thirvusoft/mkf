@@ -14,13 +14,6 @@ def throw_error(item):
 def get(filters):
 	pr_filters={}
 	pr_filters['docstatus']=1
-	if(filters.get('from_date') and filters.get('to_date')):
-		pr_filters['posting_date']=['between', (filters['from_date'], filters['to_date'])]
-	if(filters.get('supplier')):
-		pr_filters['supplier']=filters['supplier']
-	if(filters.get('purchase_receipt_no')):
-		pr_filters['name']=filters['purchase_receipt_no']
-	
 	
 	se_filters={}
 	se_filters['docstatus']=1
@@ -71,14 +64,15 @@ def get(filters):
 	batch_si_rate={}
 	batch_stock_entry={}
 	batch_labour_cost={}
-	pr_date={}
-	si_date={}
 	
 	for doc in pr: 
 		pr_doc=frappe.get_doc('Purchase Receipt', doc)
 		pr_qty={}
 		additional_cost=pr_doc.ts_total_amount
 		for row in pr_doc.items:
+			if(filters.get('batch_no')):
+				if(row.batch_no!=filters.get('batch_no')):
+					continue
 			if(row.batch_no):
 				if(row.batch_no not in batch_qty):
 					batch_qty[row.batch_no]=0
@@ -86,8 +80,8 @@ def get(filters):
 				if(row.batch_no not in batch_supplier_qty):
 					batch_supplier_qty[row.batch_no]={}
 				if(pr_doc.supplier not in batch_supplier_qty[row.batch_no]):
-					batch_supplier_qty[row.batch_no][pr_doc.supplier]=0
-				batch_supplier_qty[row.batch_no][pr_doc.supplier]+= row.qty
+					batch_supplier_qty[row.batch_no][pr_doc.supplier]=[0, pr_doc.name]
+				batch_supplier_qty[row.batch_no][pr_doc.supplier][0]+= row.qty
 
 				if(row.batch_no not in pr_qty):
 					pr_qty[row.batch_no]=0
@@ -156,25 +150,36 @@ def get(filters):
 					batch_labour_cost[batch]['wages']=0
 				batch_labour_cost[batch]['wages']+=total_cost
 	
-	
 	batch_supplier_ratio=supplier_ratio(batch_qty, batch_supplier_qty)
-	final_dict=batch_final_dict(batch_qty, batch_supplier_ratio, batch_supplier_qty, batch_stock_entry, batch_si_rate, batch_pr_rate, batch_labour_cost, item_list)
+	final_dict=batch_final_dict(filters, batch_qty, batch_supplier_ratio, batch_supplier_qty, batch_stock_entry, batch_si_rate, batch_pr_rate, batch_labour_cost, item_list)
 	return final_dict
 	
 	
 
 
-def batch_final_dict(batch_qty, batch_supplier_ratio, batch_supplier_qty, batch_stock_entry, batch_si_rate, batch_pr_rate, batch_labour_cost, item_list):
+def batch_final_dict(filters, batch_qty, batch_supplier_ratio, batch_supplier_qty, batch_stock_entry, batch_si_rate, batch_pr_rate, batch_labour_cost, item_list):
 	final_dict=[]
+	pr_filters={}
+	if(filters.get('from_date') and filters.get('to_date')):
+		pr_filters['posting_date']=['between', (filters['from_date'], filters['to_date'])]
+	if(filters.get('supplier')):
+		pr_filters['supplier']=filters['supplier']
+	if(filters.get('purchase_receipt_no')):
+		pr_filters['name']=filters['purchase_receipt_no']
+	
+	pr=frappe.get_all('Purchase Receipt', filters=pr_filters, pluck='name')
+	
 	for bat in batch_supplier_qty:
 		for sup in batch_supplier_qty[bat]:
+			if(batch_supplier_qty[bat][sup][1] not in pr):
+				continue
 			res={}
 			res['supplier']=sup
 			item_code = frappe.get_value('Batch', bat, 'item')
 			res['item_name']=frappe.get_value('Item', item_code, 'item_name')
 			res['batch']=bat
 			
-			res['qty']=batch_supplier_qty[bat][sup]
+			res['qty']=batch_supplier_qty[bat][sup][0]
 			res['uri_kg']="%.2f"%(((batch_stock_entry.get(bat) or {}).get(item_list['uri_kg']) or 0)*batch_supplier_ratio[bat][sup]/100)
 			res['uri_nos']="%.2f"%(((batch_stock_entry.get(bat) or {}).get(item_list['uri_nos']) or 0)*batch_supplier_ratio[bat][sup]/100)
 			
@@ -250,7 +255,7 @@ def supplier_ratio(batch_qty, batch_supplier_qty):
 					add=False
 			if(add):
 				batch_supplier_ratio[bat][sup]=0
-			batch_supplier_ratio[bat][sup]+=(batch_supplier_qty[bat][sup]/batch_qty[bat]*100)
+			batch_supplier_ratio[bat][sup]+=(batch_supplier_qty[bat][sup][0]/batch_qty[bat]*100)
 				
 	return batch_supplier_ratio
 
