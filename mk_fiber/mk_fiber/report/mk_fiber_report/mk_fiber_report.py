@@ -12,7 +12,7 @@ def execute(filters=None):
 	return columns, data
 
 def throw_error(item):
-	frappe.throw(f"Value missing in TS Item Settings: {item}")
+	frappe.throw(f"Value missing in TS Settings: {item}")
 
 def get(filters):
 	pr_filters={}
@@ -26,7 +26,7 @@ def get(filters):
 	si_filters['docstatus']=1
 	
 	
-	ts_item=frappe.get_single('TS Item Settings')
+	ts_item=frappe.get_single('TS Settings')
 	
 	co_kg=ts_item.coconut_in_kg or throw_error("Coconut in Kg")
 	co_nos=ts_item.coconut_in_nos or throw_error("Coconut in Nos")
@@ -280,7 +280,7 @@ def supplier_ratio(batch_qty, batch_supplier_qty):
 
 
 def get_stock_balance(item_code):
-	rate=0.0
+	rate=[]
 	for warehouse in frappe.get_all('Warehouse',pluck='name'):
 		args = {
 			"item_code": item_code,
@@ -289,9 +289,8 @@ def get_stock_balance(item_code):
 			"posting_time": nowtime(),
 		}
 		last_entry = get_previous_sle(args)
-		print(last_entry)
-		rate+=last_entry.valuation_rate if last_entry else 0.0
-	return rate
+		rate.append(last_entry.valuation_rate if last_entry else 0.0)
+	return sum(rate)
 
 
 

@@ -1,5 +1,5 @@
 {
- "add_total_row": 0,
+ "add_total_row": 1,
  "columns": [],
  "creation": "2022-06-13 13:39:14.586332",
  "disable_prepared_report": 0,
@@ -9,7 +9,7 @@
  "filters": [],
  "idx": 0,
  "is_standard": "Yes",
- "modified": "2022-06-13 13:39:14.586332",
+ "modified": "2022-06-15 17:24:21.377785",
  "modified_by": "Administrator",
  "module": "Mk Fiber",
  "name": "MK Stock Value",
