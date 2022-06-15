@@ -74,6 +74,22 @@ frappe.ui.form.on("Stock Entry",{
 				filters: {"company":frm.doc.company}
 			}
 		})
+	},
+	before_submit: function(frm){
+		let total=cur_frm.doc.ts_total_amount?cur_frm.doc.ts_total_amount:0
+		let total_qty=0
+		for(let item=0;item<cur_frm.doc.items.length;item++){
+			if(cur_frm.doc.stock_entry_type=="Repack" && cur_frm.doc.items[item].t_warehouse && !cur_frm.doc.items[item].s_warehouse )		
+			total_qty+=cur_frm.doc.items[item].qty	
+		}
+		for(let item=0;item<cur_frm.doc.items.length;item++){
+			if(cur_frm.doc.stock_entry_type=="Repack" && cur_frm.doc.items[item].t_warehouse && !cur_frm.doc.items[item].s_warehouse ){
+				let cdt=cur_frm.doc.items[item].doctype
+				let cdn=cur_frm.doc.items[item].name
+				let data=locals[cdt][cdn]
+				frappe.model.set_value(cdt, cdn, 'ts_additional_cost', (data.qty/total_qty)*total)
+			}
+		}
 	}
 })
 

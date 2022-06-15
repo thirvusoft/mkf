@@ -3,6 +3,7 @@ from frappe import _
 import copy
 from erpnext.stock.stock_ledger import get_previous_sle
 from frappe.utils import nowdate, nowtime
+from erpnext.stock.doctype.batch.batch import get_batch_qty
 
 
 def execute(filters=None):
@@ -68,13 +69,17 @@ def get(filters):
 	batch_labour_cost={}
 	batch_stock_qty={}
 	
-	batch_list=frappe.get_all('Batch', {'parent_batch_id':['!=', '']}, ['name', 'item', 'parent_batch_id', 'batch_qty'])
+	batch_list=frappe.get_all('Batch', ['name', 'item', 'parent_batch_id'])
 	for bat in batch_list:
-		if(bat['parent_batch_id'] not in batch_stock_qty):
-			batch_stock_qty[bat['parent_batch_id']]=0
-		batch_stock_qty[bat['parent_batch_id']]+= bat['batch_qty'] * get_stock_balance(bat['item'])
+		if(not bat['parent_batch_id']):
+			if(bat['name'] not in batch_stock_qty):
+				batch_stock_qty[bat['name']]=0
+			batch_stock_qty[bat['name']]+= sum([bat.get('qty') for bat in get_batch_qty(bat['name'])]) * get_stock_balance(bat['item'])
+		else:
+			if(bat['parent_batch_id'] not in batch_stock_qty):
+				batch_stock_qty[bat['parent_batch_id']]=0
+			batch_stock_qty[bat['parent_batch_id']]+= sum([bat.get('qty') for bat in get_batch_qty(bat['name'])]) * get_stock_balance(bat['item'])
 		
-	
 	
 	for doc in pr: 
 		pr_doc=frappe.get_doc('Purchase Receipt', doc)
@@ -284,6 +289,7 @@ def get_stock_balance(item_code):
 			"posting_time": nowtime(),
 		}
 		last_entry = get_previous_sle(args)
+		print(last_entry)
 		rate+=last_entry.valuation_rate if last_entry else 0.0
 	return rate
 
@@ -327,7 +333,7 @@ def get_columns(filters):
 			'label': _("Urithengai Qty (Nos)"),
 			'fieldname':'uri_nos',
 			'fieldtype':'Data',
-			'width':150
+			'width':160
 		},
 		{
 			'label': _("Copra (kg)"),

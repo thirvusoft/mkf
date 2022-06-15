@@ -40,6 +40,15 @@ frappe.ui.form.on("Sales Invoice",{
 				filters: {"company":frm.doc.company}
 			}
 		})
+	},
+	before_submit: function(frm){
+		let total=cur_frm.doc.ts_total_amount?cur_frm.doc.ts_total_amount:0
+		for(let item=0;item<cur_frm.doc.items.length;item++){
+			let cdt=cur_frm.doc.items[item].doctype
+			let cdn=cur_frm.doc.items[item].name
+			let data=locals[cdt][cdn]
+			frappe.model.set_value(cdt, cdn, 'ts_additional_cost', (data.qty/cur_frm.doc.total_qty)*total)
+		}
 	}
 })
 

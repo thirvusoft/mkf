@@ -32,7 +32,7 @@ frappe.ui.form.on("Delivery Note",{
 		frm.set_value("ts_duplicate",1)
 	},
 	setup:function(frm){
-		frm.set_query("ts_account","ts_landed_cost_voucher_table", function() {
+		frm.set_query("ts_account","ts_landed_cost_voucher_table", function(frm) {
 			return {
 				filters: {"company":frm.doc.company}
 			}
