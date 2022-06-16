@@ -23,7 +23,12 @@
   "column_break_15",
   "shell",
   "column_break_17",
-  "copra"
+  "copra",
+  "market_rate_section",
+  "change_market_value_in_report",
+  "husk_market_rate",
+  "shell_market_rate",
+  "copra_market_rate"
  ],
  "fields": [
   {
@@ -132,15 +137,44 @@
   {
    "fieldname": "column_break_17",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "market_rate_section",
+   "fieldtype": "Section Break",
+   "label": "Market Rate"
+  },
+  {
+   "default": "0",
+   "fieldname": "change_market_value_in_report",
+   "fieldtype": "Check",
+   "label": "Change Market Value in Report"
+  },
+  {
+   "fieldname": "husk_market_rate",
+   "fieldtype": "Currency",
+   "label": "Husk Market Rate",
+   "read_only_depends_on": "eval:!doc.change_market_value_in_report"
+  },
+  {
+   "fieldname": "shell_market_rate",
+   "fieldtype": "Currency",
+   "label": "Shell Market Rate",
+   "read_only_depends_on": "eval:!doc.change_market_value_in_report"
+  },
+  {
+   "fieldname": "copra_market_rate",
+   "fieldtype": "Currency",
+   "label": "Copra Market Rate",
+   "read_only_depends_on": "eval:!doc.change_market_value_in_report"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-05-06 12:04:34.663505",
+ "modified": "2022-06-15 14:46:20.262197",
  "modified_by": "Administrator",
  "module": "Mk Fiber",
- "name": "TS Item Settings",
+ "name": "TS Settings",
  "owner": "Administrator",
  "permissions": [
   {
@@ -156,6 +190,5 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
  "track_changes": 1
 }
