@@ -24,7 +24,10 @@ def get(filters):
 	
 	si_filters={}
 	si_filters['docstatus']=1
+	si_filters['update_stock']=1
 	
+	dn_filters={}
+	dn_filters['docstatus']=1
 	
 	ts_item=frappe.get_single('TS Settings')
 	
@@ -41,6 +44,7 @@ def get(filters):
 	pr=frappe.get_all('Purchase Receipt', filters=pr_filters, pluck='name')
 	se=frappe.get_all('Stock Entry', filters=se_filters, pluck='name')
 	si=frappe.get_all('Sales Invoice', filters=si_filters, pluck='name')
+	dn=frappe.get_all('Delivery Note', filters=dn_filters, pluck='name')
 
 	pi_filters={}
 	pi_filters['docstatus']=1
@@ -71,15 +75,13 @@ def get(filters):
 	
 	batch_list=frappe.get_all('Batch', ['name', 'item', 'parent_batch_id'])
 	for bat in batch_list:
-		if(not bat['parent_batch_id']):
-			if(bat['name'] not in batch_stock_qty):
-				batch_stock_qty[bat['name']]=0
-			batch_stock_qty[bat['name']]+= sum([bat.get('qty') for bat in get_batch_qty(bat['name'])]) * get_stock_balance(bat['item'])
-		else:
+		if(bat['item'] in [item_list['husk'], item_list['shell'], item_list['copra']]):
 			if(bat['parent_batch_id'] not in batch_stock_qty):
 				batch_stock_qty[bat['parent_batch_id']]=0
-			batch_stock_qty[bat['parent_batch_id']]+= sum([bat.get('qty') for bat in get_batch_qty(bat['name'])]) * get_stock_balance(bat['item'])
-		
+			ts_wh_qty=get_batch_qty(bat['name'])
+			ts_wh_rate=get_valuation_rate(bat['item'])
+			for ts_wh in ts_wh_qty:
+				batch_stock_qty[bat['parent_batch_id']]+=ts_wh['qty']*(ts_wh_rate.get(ts_wh['warehouse']) or 0)
 	
 	for doc in pr: 
 		pr_doc=frappe.get_doc('Purchase Receipt', doc)
@@ -127,16 +129,32 @@ def get(filters):
 	for doc in si:
 		si_doc=frappe.get_doc('Sales Invoice', doc)
 		for row in si_doc.items:
-			if(row.batch_no not in batch_si_rate):
-				batch=row.batch_no
-				if(not batch):
-					continue
-				ts_batch=frappe.db.get_value('Batch', batch, 'parent_batch_id')
-				if(ts_batch):
-					batch=ts_batch
-				if(batch not in batch_si_rate):
-					batch_si_rate[batch]=0
-				batch_si_rate[batch]+=row.amount
+			if(row.item_code in [item_list['husk'], item_list['shell'], item_list['copra']]):
+				if(row.batch_no not in batch_si_rate):
+					batch=row.batch_no
+					if(not batch):
+						continue
+					ts_batch=frappe.db.get_value('Batch', batch, 'parent_batch_id')
+					if(ts_batch):
+						batch=ts_batch
+					if(batch not in batch_si_rate):
+						batch_si_rate[batch]=0
+					batch_si_rate[batch]+=row.amount
+	
+	for doc in dn:
+		dn_doc=frappe.get_doc('Delivery Note', doc)
+		for row in dn_doc.items:
+			if(row.item_code in [item_list['husk'], item_list['shell'], item_list['copra']]):
+				if(row.batch_no not in batch_si_rate):
+					batch=row.batch_no
+					if(not batch):
+						continue
+					ts_batch=frappe.db.get_value('Batch', batch, 'parent_batch_id')
+					if(ts_batch):
+						batch=ts_batch
+					if(batch not in batch_si_rate):
+						batch_si_rate[batch]=0
+					batch_si_rate[batch]+=row.amount
 	
 	
 	
@@ -208,13 +226,16 @@ def batch_final_dict(filters, batch_stock_qty, batch_qty, batch_supplier_ratio, 
 			
 			purchase_amt=(batch_pr_rate.get(bat) or 0)*batch_supplier_ratio[bat][sup]/100
 			sales_amt=(batch_si_rate.get(bat) or 0)*batch_supplier_ratio[bat][sup]/100
-			
-			res['purchase_amt']="%.2f"%purchase_amt
-			res['sales_amt']="%.2f"%sales_amt
-			res['wages']="%.2f"%(((batch_labour_cost.get(bat) or {}).get(item_list['wages']) or 0)*batch_supplier_ratio[bat][sup]/100)
+			stock_in_hand=(batch_stock_qty.get(bat) or 0)*batch_supplier_ratio[bat][sup]/100
 			wages=(((batch_labour_cost.get(bat) or {}).get(item_list['wages']) or 0)*batch_supplier_ratio[bat][sup]/100)
-			res['profit']="%.2f"%(sales_amt-(purchase_amt+wages))
-			res['stock_in_hand']="%.2f"%((batch_stock_qty.get(bat) or 0)*batch_supplier_ratio[bat][sup]/100)
+			
+			res['sales_amt']="%.2f"%sales_amt
+			res['stock_in_hand']="%.2f"%(stock_in_hand)
+			res['purchase_amt']="%.2f"%purchase_amt
+			res['wages']="%.2f"%(((batch_labour_cost.get(bat) or {}).get(item_list['wages']) or 0)*batch_supplier_ratio[bat][sup]/100)
+			
+			res['profit']="%.2f"%((sales_amt+stock_in_hand)-(purchase_amt+wages))
+			
 			final_dict.append(res)
 	final_dict.sort(key= lambda x: x['batch'])
 	final_dict_1 = []
@@ -279,8 +300,8 @@ def supplier_ratio(batch_qty, batch_supplier_qty):
 
 
 
-def get_stock_balance(item_code):
-	rate=[]
+def get_valuation_rate(item_code):
+	rate={}
 	for warehouse in frappe.get_all('Warehouse',pluck='name'):
 		args = {
 			"item_code": item_code,
@@ -289,8 +310,8 @@ def get_stock_balance(item_code):
 			"posting_time": nowtime(),
 		}
 		last_entry = get_previous_sle(args)
-		rate.append(last_entry.valuation_rate if last_entry else 0.0)
-	return sum(rate)
+		rate[warehouse]=last_entry.valuation_rate if last_entry else 0.0
+	return rate
 
 
 
@@ -359,16 +380,22 @@ def get_columns(filters):
 			'width':120
 		},
 		{
-			'label': _("Purchase Amount"),
-			'fieldname':'purchase_amt',
-			'fieldtype':'Currency',
-			'width':150
-		},
-		{
 			'label': _("Sales Amount"),
 			'fieldname':'sales_amt',
 			'fieldtype':'Currency',
 			'width':120
+		},
+		{
+			'label': _("Stock in Hand"),
+			'fieldname':'stock_in_hand',
+			'fieldtype':'Currency',
+			'width':150,
+		},
+		{
+			'label': _("Purchase Amount"),
+			'fieldname':'purchase_amt',
+			'fieldtype':'Currency',
+			'width':150
 		},
 		{
 			'label': _("Wages"),
@@ -381,13 +408,6 @@ def get_columns(filters):
 			'fieldname':'profit',
 			'fieldtype':'Currency',
 			'width':150,
-		},
-		{
-			'label': _("Stock in Hand"),
-			'fieldname':'stock_in_hand',
-			'fieldtype':'Currency',
-			'width':150,
-		}
-		
+		}		
 	]
 	return columns
